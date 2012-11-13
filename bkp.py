@@ -1,6 +1,6 @@
 '''
-    Initialisation script for command line based backup utility... V 1.0
-    Copyright (C) 2012 Pradeep Balan Pillai
+    Module defining functions for a simple backup utility..V 1.01
+    Copyright (C) 2012  Pradeep Balan PIllai
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,38 +17,69 @@
 '''
 
 '''
-bkp.py: initialisation script for command line based backup utility
-Version: 1.0
-
+backup.py: module containing functions for backup utility
+Version: 2.0
 '''
-import sys
 
-import backup
+#!/usr/bin/python
 
-# Function to process command
-def process_command(command_list):
-    try:
-        file_handler = open(command_list[2], 'r')
-        # Remove the newline character also while adding path list
-        data = [line.rstrip() for line in file_handler.readlines()]
-        #data = file_handler.readlines()
-        file_handler.close()
-    except IOError:
-        print 'Error reading data file'
+import os
+import shutil
+import time
 
-    # Remove the newline characters
+
+
+# Function updates the file at backup location
+def update_file(path, bkp_location):
+    npath = os.path.normpath(path)
+    nbkp_location = os.path.normpath(bkp_location)
+    arch_path = os.path.join(nbkp_location, os.path.split(npath)[1])
+    update_path(npath, arch_path)
+
+
+# Function updates folder at backup location
+def update_folder(path, bkp_location):
+    npath = os.path.normpath(path)
+    nbkp_location = os.path.normpath(bkp_location)
     
-    if command_list[1] == '-n':
-        backup.create_new_backup(data[0])
-    elif command_list[1] == '-a':
-        backup.add_items_to_backup(data[1:], data[0])
-    elif command_list[1] == '-t':
-        pass # test code here
+    tree = os.walk(npath)
+    base = os.path.split(npath)[0]
 
+    for item in tree:
+        for name in item[2]:
+            abs_path = os.path.normpath(os.path.join(item[0], name))
+            arch_path = os.path.normpath(os.path.join(nbkp_location,
+                                            abs_path.lstrip(base)))
 
-if len(sys.argv) < 3:
-    print 'Insufficient parameters'
-else:
-    process_command(sys.argv)
+            update_path(abs_path, arch_path)
 
+# Function for updatibg the path
+def update_path(abs_path, arch_path):
+    nabs_path = os.path.normpath(abs_path)
+    narch_path = os.path.normpath(arch_path)
+    print 'Checking: %s' % nabs_path
+    if os.path.exists(narch_path) and (os.path.getmtime(nabs_path)
+                                    < os.path.getmtime(narch_path)):
+        pass
+    else:
+        # Create sub-directories if required
+        try:
+            os.makedirs(os.path.split(narch_path)[0])
+        except os.error:
+            pass
         
+        # Copy file path
+        try:
+            print 'Adding: %s...%d' % (nabs_path, os.path.getsize(nabs_path))
+            shutil.copy(nabs_path, narch_path)
+        except IOError:
+            print 'Error while handling file'
+
+# Function to add or update files/ folders to backup location
+def update_backup_location(path_list, bkp_location):
+    for path in path_list:
+        if os.path.isfile(path):
+            update_file(os.path.normpath(path), os.path.normpath(bkp_location))
+        elif os.path.isdir(path):
+            update_folder(os.path.normpath(path), os.path.normpath(bkp_location))
+    print '\n' + 10*'=' + ' DONE ' + 10*'='            
