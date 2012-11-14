@@ -18,7 +18,7 @@
 
 '''
 bkp.py: initialisation script for command line based backup utility
-Version: 1.0
+Version: 2.0
 
 '''
 import sys
