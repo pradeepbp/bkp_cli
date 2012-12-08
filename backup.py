@@ -18,9 +18,8 @@
 
 '''
 backup.py: module containing functions for backup utility
-Version: 2.0
+Version: 2.1
 '''
-
 #!/usr/bin/python
 
 import os
@@ -51,6 +50,7 @@ def update_folder(path, bkp_location):
             arch_path = os.path.normpath(os.path.join(nbkp_location,
                                             abs_path.lstrip(base)))
 
+            print 'abs:%s arch:%s' % (abs_path, arch_path)
             update_path(abs_path, arch_path)
 
 # Function for updatibg the path
@@ -81,5 +81,45 @@ def update_backup_location(path_list, bkp_location):
         if os.path.isfile(path):
             update_file(os.path.normpath(path), os.path.normpath(bkp_location))
         elif os.path.isdir(path):
-            update_folder(os.path.normpath(path), os.path.normpath(bkp_location))
+            update_folder(os.path.normpath(path),
+                          os.path.normpath(bkp_location))
     print '\n' + 10*'=' + ' DONE ' + 10*'='            
+
+# Function to create an empty data file at backup location
+def create_data_file(bkp_location):
+    file_handle = open(os.path.join(bkp_location, 'bkpconfig.txt'), 'w')
+    file_handle.write(os.path.normpath(bkp_location)+'\n')
+    file_handle.close()
+
+# Function to add paths to data file
+def add_path_to_data_file(bkp_path, source_path):
+    try:
+        file_handle = open(os.path.join(os.path.normpath(bkp_path),
+                           'bkpconfig.txt'),'a')
+        file_handle.write(os.path.normpath(source_path) + '\n')
+        file_handle.close()
+    except IOError:
+        print 'Error opening config data file; check backup path'
+  
+# Function to update backup when only backup location is passed as an argument
+def update_all(bkp_location):
+    try:
+        file_handler = open(os.path.join(os.path.normpath(bkp_location),
+                            'bkpconfig.txt'), 'r')
+        path_data = [line.rstrip() for line in file_handler.readlines()]
+        file_handler.close()
+        update_backup_location(path_data[1:], bkp_location)
+    except IOError:
+        print 'Error opening config data file; check backup path.'
+
+'''
+Functions returns True if the passed path is a valid backup location
+by examining the presence of config file
+'''
+def is_valid_backup(path):
+    pass
+    config_file_path = os.path.join(os.path.normpath(path), 'bkpconfig.txt')
+    if os.path.exists(config_file_path):
+        return True
+    else:
+        return False
