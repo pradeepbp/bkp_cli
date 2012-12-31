@@ -17,7 +17,9 @@
 '''
 
 '''
-bkp.py: initialisation script for command line based backup utility
+bkp.py:
+Command line interface for managing backups. Currently this has got
+limited functionality
 Version: 2.0
 
 '''

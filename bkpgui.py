@@ -19,7 +19,8 @@
 
 '''
 bkpgui.py
-Version: 1.0
+Version: 2.0
+GUI front end for managing backups
 '''
 
 #!/usr/bin/python
@@ -27,7 +28,8 @@ Version: 1.0
 import wx
 
 import backup
-
+import itemdialog
+import abt
 
 class MainFrame(wx.Frame):
     def __init__(self, parent=None):
@@ -38,18 +40,22 @@ class MainFrame(wx.Frame):
     def draw_gui(self):
         self.SetTitle('Backup Utility')
         self.SetSize((500, 300))
-        main_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(main_sizer)
 
-        select_label = wx.StaticText(self, label='Select:')
-        location_panel = wx.Panel(self)
-        edit_panel = wx.Panel(self)
-        control_panel = wx.Panel(self)
+        main_panel = wx.Panel(self)
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        main_panel.SetSizer(main_sizer)
+
+        select_label = wx.StaticText(main_panel, label='Select:')
+        location_panel = wx.Panel(main_panel)
+        edit_panel = wx.Panel(main_panel)
+        control_panel = wx.Panel(main_panel)
 
         main_sizer.Add(select_label, flag=wx.EXPAND | wx.ALL, border=5)
         main_sizer.Add(location_panel, flag=wx.EXPAND | wx.ALL, border=5)
-        main_sizer.Add(edit_panel, flag=wx.EXPAND|wx.ALL, border=5)
+        main_sizer.Add(edit_panel, flag=wx.EXPAND|wx.ALL, border=5,
+                       proportion=1)
         main_sizer.Add(control_panel, flag=wx.EXPAND|wx.ALL, border=5)
+
 
 
         # Location panel
@@ -58,7 +64,7 @@ class MainFrame(wx.Frame):
         self.path = wx.TextCtrl(location_panel,
                                 value='Click to open location...',
                                 style=wx.TE_READONLY)
-        open_button = wx.Button(location_panel, label='Open')
+        open_button = wx.Button(location_panel, wx.ID_OPEN)
 
         location_sizer.Add(self.path, proportion=1, flag=wx.GROW|wx.ALL,
                            border=5)
@@ -68,47 +74,42 @@ class MainFrame(wx.Frame):
 
         location_panel.Show()
 
+
+
         # Edit panel
-        edit_sub_sizer = wx.BoxSizer(wx.VERTICAL)
         edit_sizer = wx.StaticBoxSizer(wx.StaticBox(edit_panel,label='Edit'),
                                        wx.HORIZONTAL)
         edit_panel.SetSizer(edit_sizer)
-
         self.message_pane = wx.TextCtrl(edit_panel, style=wx.TE_MULTILINE |
                                    wx.TE_READONLY)
-        self.addfile_button = wx.Button(edit_panel, label='Add file...')
-        self.addfile_button.Enable(False)
-        self.addfolder_button = wx.Button(edit_panel, label='Add folder...')
-        self.addfolder_button.Enable(False)
-        delete_button = wx.Button(edit_panel, label='Delete...')
-        delete_button.Enable(False)
 
         edit_sizer.Add(self.message_pane, flag=wx.EXPAND|wx.ALL, proportion=1,
                        border=5)
-        edit_sizer.Add(edit_sub_sizer, flag=wx.ALL, border=5)
-        edit_sub_sizer.Add(self.addfile_button, flag=wx.ALL, border=5)
-        edit_sub_sizer.Add(self.addfolder_button, flag=wx.ALL, border=5)
-        edit_sub_sizer.Add(delete_button, flag=wx.ALL, border=5)
 
-        self.Bind(wx.EVT_BUTTON, self.add_file, self.addfile_button)
-        self.Bind(wx.EVT_BUTTON, self.add_folder, self.addfolder_button)
 
         # Control panel
         control_sizer = wx.BoxSizer(wx.HORIZONTAL)
         control_panel.SetSizer(control_sizer)
-        self.create_button = wx.Button(control_panel, label='Create')
+        self.create_button = wx.Button(control_panel, label='Cre&ate')
         self.create_button.Enable(False)
-        self.update_button = wx.Button(control_panel, label='Update')
+        self.edit_button = wx.Button(control_panel, label='&Edit')
+        self.edit_button.Enable(False)
+        self.update_button = wx.Button(control_panel, label='&Update')
         self.update_button.Enable(False)
-        close_button = wx.Button(control_panel, label='Close')
+        close_button = wx.Button(control_panel, wx.ID_CLOSE)
+        about_button = wx.Button(control_panel, label='&About')
 
         control_sizer.Add(self.create_button, proportion=0, border=5)
+        control_sizer.Add(self.edit_button, proportion=0, border=5)
         control_sizer.Add(self.update_button, proportion=0, border=5)
         control_sizer.Add(close_button, border=5)
+        control_sizer.Add(about_button, flag=wx.LEFT, border=50)
 
         self.Bind(wx.EVT_BUTTON, self.click_create, self.create_button)
         self.Bind(wx.EVT_BUTTON, self.on_click_close, close_button)
         self.Bind(wx.EVT_BUTTON, self.click_update, self.update_button)
+        self.edit_button.Bind(wx.EVT_BUTTON, self.click_edit)
+        about_button.Bind(wx.EVT_BUTTON, self.click_about)
 
         # Resize the frame to contain all widgets
         #self.Fit()
@@ -133,9 +134,8 @@ class MainFrame(wx.Frame):
             print dir_open_dialog.GetPath()
             self.path.ChangeValue(dir_open_dialog.GetPath())
             if backup.is_valid_backup(self.path.GetValue()):
+                self.edit_button.Enable(True)
                 self.update_button.Enable(True)
-                self.addfile_button.Enable(True)
-                self.addfolder_button.Enable(True)
             else:
                 self.create_button.Enable(True)
             dir_open_dialog.Destroy()
@@ -156,10 +156,9 @@ class MainFrame(wx.Frame):
 
     def click_create(self, event):
         backup.create_data_file(self.path.GetValue())
+        self.edit_button.Enable(True)
         self.update_button.Enable(True)
         self.create_button.Enable(False)
-        self.addfile_button.Enable(True)
-        self.addfolder_button.Enable(True)
         self.message_pane.AppendText('New backup location created\n')
 
 
@@ -178,10 +177,26 @@ class MainFrame(wx.Frame):
 
     # Event handler for update button
     def click_update(self, event):
-        self.message_pane.AppendText('Updating backup...\n')
+        self.message_pane.AppendText('Updating backup...wait\n')
         backup.update_all(self.path.GetValue())
         self.message_pane.AppendText('Done!\n')
 
+    # Event handler for edit button
+    def click_edit(self, event):
+        selected_bkp = self.path.GetValue()
+        source_paths = backup.get_backup_sources(selected_bkp)
+        dialog = itemdialog.ItemDialog(self,'Add item',source_paths)
+        resp = dialog.ShowModal()
+        if resp == wx.ID_OK:
+            modified_paths = dialog.get_list()
+            backup.update_config_file(selected_bkp, modified_paths)
+            dialog.Destroy()
+        else:
+            dialog.Destroy()
+
+    def click_about(self, event):
+        abt.About()
+        
 # App initialiser
 if __name__ == '__main__':
     app = wx.App(redirect=False)

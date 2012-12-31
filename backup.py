@@ -17,8 +17,9 @@
 '''
 
 '''
-backup.py: module containing functions for backup utility
-Version: 2.1
+backup.py
+Module for performing various backup related activities
+Version: 2.0
 '''
 #!/usr/bin/python
 
@@ -91,12 +92,25 @@ def create_data_file(bkp_location):
     file_handle.write(os.path.normpath(bkp_location)+'\n')
     file_handle.close()
 
-# Function to add paths to data file
+# Function to add single path to data file
 def add_path_to_data_file(bkp_path, source_path):
     try:
         file_handle = open(os.path.join(os.path.normpath(bkp_path),
                            'bkpconfig.txt'),'a')
         file_handle.write(os.path.normpath(source_path) + '\n')
+        file_handle.close()
+    except IOError:
+        print 'Error opening config data file; check backup path'
+
+
+# Function to add multiple paths to data file at a time
+def add_paths_to_data_file(bkp_path, source_paths):
+
+    try:
+        file_handle = open(os.path.join(os.path.normpath(bkp_path),
+                           'bkpconfig.txt'),'a')
+        for path in source_paths:
+            file_handle.write(os.path.normpath(path) + '\n')
         file_handle.close()
     except IOError:
         print 'Error opening config data file; check backup path'
@@ -122,4 +136,35 @@ def is_valid_backup(path):
     if os.path.exists(config_file_path):
         return True
     else:
+        return False
+
+
+''' 
+Function to return the file path contained in the config file
+'''
+def get_backup_sources(bkp_location):
+    config_file = os.path.join(os.path.normpath(bkp_location), 'bkpconfig.txt')
+    try:
+        file_h = open(config_file, 'r')
+        source_paths = [line.rstrip() for line in file_h.readlines()]
+        file_h.close()
+        return source_paths[1:]
+
+    except:
+        print 'Configuration File Error'
+
+'''
+Function to update config file with new source data; return True if
+update was successfull
+'''
+def update_config_file(bkp_location, source_paths):
+    config_file = os.path.join(os.path.normpath(bkp_location), 'bkpconfig.txt')
+    try:
+        file_h = open(config_file, 'w')
+        file_h.write(os.path.normpath(bkp_location) + '\n')
+        for path in source_paths:
+            file_h.write(os.path.normpath(path)+'\n')
+        file_h.close()
+        return True
+    except:
         return False
