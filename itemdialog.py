@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 '''
     GUI interface for managing backups
@@ -22,7 +23,6 @@ bkpgui.py
 Version: 2.0
 Module to create dialog box for visually modifying contents of a list
 '''
-#!/usr/bin/python
 
 import wx
 import os

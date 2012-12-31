@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 '''
     Module defining functions for a simple backup utility..V 1.01
     Copyright (C) 2012  Pradeep Balan PIllai
@@ -21,7 +23,6 @@ backup.py
 Module for performing various backup related activities
 Version: 2.0
 '''
-#!/usr/bin/python
 
 import os
 import shutil

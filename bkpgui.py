@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 '''
     GUI interface for managing backups
@@ -23,7 +24,6 @@ Version: 2.0
 GUI front end for managing backups
 '''
 
-#!/usr/bin/python
 
 import wx
 

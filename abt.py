@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 '''
     GUI interface for managing backups
@@ -23,7 +24,6 @@ Version: 2.0
 Module to create About dialog box
 '''
 
-#!/usr/bin/python
 import wx
 import wx.html
 

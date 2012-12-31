@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 '''
     Initialisation script for command line based backup utility... V 1.0
     Copyright (C) 2012 Pradeep Balan Pillai
