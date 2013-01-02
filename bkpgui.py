@@ -20,7 +20,7 @@
 
 '''
 bkpgui.py
-Version: 2.0
+Version: 2.01
 GUI front end for managing backups
 '''
 
@@ -77,8 +77,8 @@ class MainFrame(wx.Frame):
 
 
         # Edit panel
-        edit_sizer = wx.StaticBoxSizer(wx.StaticBox(edit_panel,label='Edit'),
-                                       wx.HORIZONTAL)
+        edit_sizer = wx.StaticBoxSizer(wx.StaticBox(edit_panel,label=
+                                        'Messages'), wx.HORIZONTAL)
         edit_panel.SetSizer(edit_sizer)
         self.message_pane = wx.TextCtrl(edit_panel, style=wx.TE_MULTILINE |
                                    wx.TE_READONLY)

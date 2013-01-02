@@ -20,7 +20,7 @@
 
 '''
 abt.py
-Version: 2.0
+Version: 2.01
 Module to create About dialog box
 '''
 
@@ -30,7 +30,8 @@ import wx.html
 
 class About(wx.Frame):
     def __init__(self, parent=None):
-        wx.Frame.__init__(self, parent, style=wx.CLOSE_BOX)
+        wx.Frame.__init__(self, parent, style=wx.DEFAULT_FRAME_STYLE &
+                          ~ wx.MAXIMIZE_BOX)
         self.draw_gui()
 
     def draw_gui(self):
