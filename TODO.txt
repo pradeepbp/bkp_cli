@@ -1,3 +1,3 @@
-1. [done]GUI for manging backups
-2. Possibly, a restore function (this will be realised only by saving location data in a separate file)
-3. Logging function
+@ Possibly, a restore function (this will be realised only by saving location data in a separate file)
+@ Logging function
+@ Provide key board shorcut for OK button in About dialog
