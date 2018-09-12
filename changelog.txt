@@ -3,3 +3,5 @@ Version 2.0
 1. Improved algorithm to update backup without creating or reading configuration file.
 2. Creation and updation of backup is now using only one command line parameter, '-a'
 3. Completely revamped the GUI interface
+4. Trying out git ...
+
