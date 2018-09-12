@@ -4,4 +4,5 @@ Version 2.0
 2. Creation and updation of backup is now using only one command line parameter, '-a'
 3. Completely revamped the GUI interface
 4. Trying out git ...
+5. Adding a new file
 
